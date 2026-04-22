@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointment Booking</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{
+    box-sizing:border-box;
+    font-family:Roboto,sans-serif
+}
+body{
+    margin:0;
+    position: relative;
+    min-height: 100vh;
+    background: #f0f0f0; 
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=2000') no-repeat center center fixed;
+    background-size: cover;
+    filter: blur(8px); 
+    -webkit-filter: blur(8px);
+    z-index: -1;
+    transform: scale(1.1); 
+}
+
+.top-bar{
+    background: rgba(233, 244, 243, 0.95);
+    padding:6px 40px;
+    font-size:13px;
+    display:flex;
+    justify-content:space-between;
+    color:#555;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.top-bar > div{
+    transition: color 0.3s ease;
+    cursor: default;
+}
+.top-bar > div:hover{
+    color:#35c3b1;
+}
+.navbar{
+    background: linear-gradient(90deg, rgba(43, 183, 166, 0.95), rgba(53, 195, 177, 0.95));
+    padding:14px 40px;
+    display:flex;
+    gap:30px;
+    position: relative;
+}
+.navbar a{
+    color:#fff;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing: 0.5px;
+    position: relative;
+    transition: color 0.3s ease;
+}
+.navbar a::after{
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+.navbar a:hover{
+    color: #e0f7f5;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+.navbar a:hover::after{
+    width: 80%;
+}
+.header{
+    background: rgba(255, 255, 255, 0.7);
+    padding:40px;
+    position: relative;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+.header:hover{
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 5px 20px rgba(53, 195, 177, 0.15);
+}
+.header h1{
+    margin:0;
+    font-size:30px;
+    font-weight:500;
+    color: #2c3e50;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: inline-block;
+}
+.header h1:hover{
+    color:#35c3b1;
+    transform: translateX(5px);
+}
+.breadcrumb{
+    margin-top:6px;
+    font-size:14px;
+    color:#555;
+    transition: all 0.3s ease;
+    display: inline-block;
+    cursor: default;
+}
+.breadcrumb:hover{
+    color:#35c3b1;
+    transform: scale(1.02);
+}
+.container{
+    max-width:1000px;
+    margin:40px auto;
+    padding:0 20px;
+    position: relative;
+}
+.form-box{
+    background: rgba(255, 255, 255, 0.95); 
+    padding:30px;
+    border-radius:12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+.form-box:hover{
+    box-shadow: 0 20px 45px rgba(53, 195, 177, 0.2);
+    transform: translateY(-2px);
+}
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px 30px
+}
+label{
+    font-size:14px;
+    font-weight:500;
+    margin-bottom:6px;
+    display:block;
+    color: #444;
+    transition: color 0.3s ease;
+}
+label:hover{
+    color:#35c3b1;
+}
+label span{ color:red }
+input,select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccd1d1;
+    border-radius:4px;
+    font-size:14px;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+input:focus,select:focus{
+    outline:none;
+    border-color:#35c3b1;
+    box-shadow: 0 0 8px rgba(53, 195, 177, 0.4);
+}
+
+/* Hover Effects for Input Fields */
+input:hover,select:hover{
+    border-color:#35c3b1;
+    box-shadow: 0 0 8px rgba(53, 195, 177, 0.25);
+    transform: translateY(-1px);
+}
+.full{ grid-column:1 / -1 }
+button{
+    margin-top:20px;
+    padding:12px 26px;
+    background:#35c3b1;
+    border:none;
+    color:#fff;
+    font-size:15px;
+    font-weight: 500;
+    border-radius:4px;
+    cursor:pointer;
+    transition: 0.3s;
+}
+button:hover{
+    background:#2bb7a6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.payment-options {
+    margin-top: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f8f0, #e8f5e8);
+    border-radius: 6px;
+    border: 1px solid #c8e6c9;
+    transition: all 0.3s ease;
+}
+.payment-options:hover{
+    box-shadow: 0 5px 20px rgba(53, 195, 177, 0.15);
+}
+.payment-options h3 { margin: 0 0 20px 0; font-size: 18px; font-weight: 500; transition: color 0.3s ease; }
+.payment-options:hover h3{ color:#35c3b1; }
+.payment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+
+.payment-option { 
+    display: flex; 
+    align-items: center; 
+    padding: 15px; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    background: #fff; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+}
+.payment-option:hover { 
+    border-color: #35c3b1; 
+    background: #f9ffff;
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(53, 195, 177, 0.2);
+}
+.payment-option i {
+    font-size: 20px;
+    margin-right: 12px;
+    color: #35c3b1;
+    width: 25px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+.payment-option:hover i {
+    transform: scale(1.2);
+}
+.payment-option input[type="radio"] { margin-right: 10px; }
+.mobile-input-container { position: relative; }
+.mobile-input-container input { padding-left: 70px; transition: all 0.3s ease; }
+.mobile-input-container .prefix { 
+    position: absolute; 
+    left: 10px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    background: #f0f0f0; 
+    padding: 5px 8px; 
+    border-radius: 4px; 
+    font-size: 12px; 
+    border: 1px solid #ddd; 
+    transition: all 0.3s ease;
+}
+.mobile-input-container:hover .prefix{
+    background: #e0f7f5;
+    border-color: #35c3b1;
+}
+
+#card-details, #netbanking-details, #upi-details {
+    transition: all 0.3s ease;
+}
+#card-details label{
+    transition: color 0.3s ease;
+}
+#card-details label:hover{
+    color:#35c3b1;
+}
+
+@media(max-width:768px){
+    .form-grid{ grid-template-columns:1fr }
+    .top-bar,.navbar,.header{ padding:20px }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div>Emergency Help: 123-456-789</div>
+    <div>Location: Andhra Pradesh, Guntur &nbsp;&nbsp; Mon - Sat: 9.00 - 10.00</div>
+</div>
+
+<div class="navbar">
+    <a href="#">HOSPITAL APPOINTMENT BOOKING</a>
+</div>
+
+<div class="header">
+    <h1>Book An Appointment</h1>
+    <div class="breadcrumb"> &gt; Appointment section</div>
+</div>
+
+<div class="container">
+    <div class="form-box">
+        <form id="appointmentForm">
+            <div class="form-grid">
+                <div>
+                    <label>Patient Name <span>*</span></label>
+                    <input type="text" id="patientName" placeholder="Enter Patient Name" maxlength="20" required>
+                </div>
+                <div>
+                    <label>Patient Age <span>*</span></label>
+                    <input type="number" id="patientAge" placeholder="Age" min="1" max="100" required>
+                </div>
+                <div>
+                    <label>Available Hospitals <span>*</span></label>
+                    <select id="hospitalSelect" required>
+                        <option value="">Select Hospital</option>
+                        <option>Lalitha Multi speciality Hospital(Kothapet)</option>
+                        <option>Ramesh Hospital(Kannavari Thota)</option>
+                        <option>Vikas Hospital(Kannavari Thota)</option>
+                        <option>Tulasi Hospital(Guntur vari Thota)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Appointment of Specialist <span>*</span></label>
+                    <select id="specialistSelect" required>
+                        <option value="">Select Doctor Type</option>
+                        <option>General Physician</option>
+                        <option>Cardiologist</option>
+                        <option>Dentist</option>
+                        <option>Orthopedic</option>
+                        <option>Neurologist</option>
+                        <option>Gastroenterologists</option>
+                        <option>Nephrologist</option>
+                        <option>Otolaryngologist (ENT)</option>
+                        <option>Urologist</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Appointment Date <span>*</span></label>
+                    <input type="date" id="appointmentDate" required>
+                </div>
+                <div>
+                    <label>Appointment Time <span>*</span></label>
+                    <select id="timeSlotSelect" required>
+                        <option value="">Select Time Slot</option>
+                        <option>09:00 AM - 10:00 AM</option>
+                        <option>10:00 AM - 11:00 AM</option>
+                        <option>11:00 AM - 12:00 PM</option>
+                        <option>02:00 PM - 03:00 PM</option>
+                        <option>03:00 PM - 04:00 PM</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Mobile Number <span>*</span></label>
+                    <div class="mobile-input-container">
+                        <span class="prefix">🇮🇳 +91</span>
+                        <input type="tel" id="mobileNumber" placeholder="Phone Number" pattern="^[6-9]\d{9}$" title="Enter a valid 10-digit Indian mobile number" required>
+                    </div>
+                </div>
+                <div class="full">
+                    <label>Email</label>
+                    <input type="email" id="emailAddress" placeholder="Email Address">
+                </div>
+            </div>
+            <button type="submit">Book Appointment</button>
+        </form>
+
+        <div id="payment-options" class="payment-options" style="display: none;">
+            <h3>Select Payment Method</h3>
+            <div class="payment-grid">
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="card" required>
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Pay through Card</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="netbanking" required>
+                    <i class="fa-solid fa-building-columns"></i>
+                    <span>Netbanking</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="pay-on-visit" required>
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>Pay on Visit</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="upi" required>
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span>Pay UPI</span>
+                </label>
+            </div>
+
+            <div id="card-options" style="display: none; margin-top: 20px;">
+                <label class="payment-option"><input type="radio" name="card-type" value="credit"><span>Credit Card</span></label>
+                <label class="payment-option"><input type="radio" name="card-type" value="debit"><span>Debit Card</span></label>
+                <div id="card-details" style="display: none; margin-top: 20px;">
+                    <label>Card Number <span>*</span></label>
+                    <input type="text" id="card-number" placeholder="Enter 12-digit Number" pattern="\d{12}">
+                    <label style="margin-top:10px">CVV <span>*</span></label>
+                    <input type="text" id="cvv" placeholder="CVV" pattern="\d{3}">
+                </div>
+            </div>
+
+            <div id="netbanking-details" style="display: none; margin-top: 20px;">
+                <label>Banking ID <span>*</span></label>
+                <input type="text" id="banking-id" placeholder="Please enter Banking ID">
+            </div>
+
+            <div id="upi-details" style="display: none; margin-top: 20px;">
+                <label>UPI ID <span>*</span></label>
+                <input type="text" id="upi-id" placeholder="Please enter UPI ID">
+            </div>
+
+            <button id="back-btn" type="button" style="background: #ccc; color: #000; margin-right: 10px;">Back</button>
+            <button id="proceed-btn" type="button">Proceed</button>
+        </div>
+
+        <div id="confirmation" class="payment-options" style="display: none;">
+            <h3>Appointment Fee</h3>
+            <p>Amount: ₹300</p>
+            <p style="font-size: 0.9em; color: #666;">Clicking continue will download the appointment invoice.</p>
+            <button id="back-to-payment" type="button" style="background: #ccc; color: #000; margin-right: 10px;">Back</button>
+            <button id="continue-btn" type="button">Continue & Download Invoice</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('appointmentForm');
+    const paymentOptions = document.getElementById('payment-options');
+    const cardOptions = document.getElementById('card-options');
+    const proceedBtn = document.getElementById('proceed-btn');
+    const backBtn = document.getElementById('back-btn');
+    const paymentRadios = document.querySelectorAll('input[name="payment"]');
+    const confirmation = document.getElementById('confirmation');
+    const continueBtn = document.getElementById('continue-btn');
+    const backToPaymentBtn = document.getElementById('back-to-payment');
+
+    // Date Restriction
+    const dateInput = document.getElementById('appointmentDate');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+
+    // Initial Submit -> Show Payment
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (form.checkValidity()) {
+            form.style.display = 'none';
+            paymentOptions.style.display = 'block';
+        }
+    });
+
+    // Payment Logic
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            cardOptions.style.display = this.value === 'card' ? 'block' : 'none';
+            document.getElementById('netbanking-details').style.display = this.value === 'netbanking' ? 'block' : 'none';
+            document.getElementById('upi-details').style.display = this.value === 'upi' ? 'block' : 'none';
+        });
+    });
+
+    const cardTypeRadios = document.querySelectorAll('input[name="card-type"]');
+    cardTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('card-details').style.display = 'block';
+        });
+    });
+
+    backBtn.addEventListener('click', () => { paymentOptions.style.display = 'none'; form.style.display = 'block'; });
+    
+    proceedBtn.addEventListener('click', () => {
+        const selected = document.querySelector('input[name="payment"]:checked');
+        if (selected) {
+            paymentOptions.style.display = 'none'; 
+            confirmation.style.display = 'block';
+        } else alert('Please select a payment method.');
+    });
+
+    // FINAL INVOICE DOWNLOAD LOGIC
+    continueBtn.addEventListener('click', () => {
+        // Extract form values
+        const patientName = document.getElementById('patientName').value;
+        const patientAge = document.getElementById('patientAge').value;
+        const hospital = document.getElementById('hospitalSelect').options[document.getElementById('hospitalSelect').selectedIndex].text;
+        const specialist = document.getElementById('specialistSelect').options[document.getElementById('specialistSelect').selectedIndex].text;
+        const apptDate = document.getElementById('appointmentDate').value;
+        const timeSlot = document.getElementById('timeSlotSelect').options[document.getElementById('timeSlotSelect').selectedIndex].text;
+        const mobileNumber = document.getElementById('mobileNumber').value;
+        const email = document.getElementById('emailAddress').value;
+        const paymentMethod = document.querySelector('input[name="payment"]:checked') ? document.querySelector('input[name="payment"]:checked').value : 'Not selected';
+
+        // Generate invoice HTML
+        const invoiceHTML = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Appointment Invoice</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+                    .invoice { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+                    h1 { color: #35c3b1; text-align: center; }
+                    .section { margin-bottom: 20px; }
+                    .section h2 { border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333; }
+                    .section p { margin: 5px 0; }
+                    .footer { text-align: center; margin-top: 20px; color: #666; }
+                </style>
+            </head>
+            <body>
+                <div class="invoice">
+                    <h1>Appointment Invoice</h1>
+                    <div class="section">
+                        <h2>Patient Details</h2>
+                        <p><strong>Name:</strong> ${patientName}</p>
+                        <p><strong>Age:</strong> ${patientAge}</p>
+                        <p><strong>Mobile:</strong> +91 ${mobileNumber}</p>
+                        <p><strong>Email:</strong> ${email || 'N/A'}</p>
+                    </div>
+                    <div class="section">
+                        <h2>Appointment Details</h2>
+                        <p><strong>Hospital:</strong> ${hospital}</p>
+                        <p><strong>Specialist:</strong> ${specialist}</p>
+                        <p><strong>Date:</strong> ${apptDate}</p>
+                        <p><strong>Time Slot:</strong> ${timeSlot}</p>
+                    </div>
+                    <div class="section">
+                        <h2>Payment Details</h2>
+                        <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+                        <p><strong>Amount:</strong> ₹300</p>
+                    </div>
+                    <div class="footer">
+                        <p>Thank you for booking with us!</p>
+                        <p>Hospital Appointment Booking System</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        // Create blob and download
+        const blob = new Blob([invoiceHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'appointment_invoice.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert('Appointment confirmed! Invoice downloaded.');
+        location.reload(); // Reset form
+    });
+
+    backToPaymentBtn.addEventListener('click', () => { confirmation.style.display = 'none'; paymentOptions.style.display = 'block'; });
+});
+</script>
+
+</body>
+</html>
